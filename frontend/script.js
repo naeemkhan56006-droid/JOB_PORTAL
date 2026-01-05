@@ -1,64 +1,78 @@
-// Global configuration
-const API_BASE_URL = window.location.origin + '/api';
+const API_URL = window.location.origin + '/api';
 
 // Utility functions
-function showAlert(type, message) {
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = `
-        <div>${message}</div>
-        <button class="close-alert">&times;</button>
-    `;
-    
-    const existingAlert = document.querySelector('.alert');
-    if (existingAlert) {
-        existingAlert.remove();
-    }
-    
-    document.body.insertBefore(alert, document.body.firstChild);
-    
-    setTimeout(() => {
-        if (alert.parentNode) alert.remove();
-    }, 5000);
-    
-    alert.querySelector('.close-alert').addEventListener('click', () => alert.remove());
+function showAlert(message, type = 'info') {
+    alert(message);
 }
 
-function setLoading(element, isLoading, loadingText = 'Loading...') {
-    if (isLoading) {
-        element.dataset.originalText = element.innerHTML;
-        element.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${loadingText}`;
-        element.disabled = true;
-    } else {
-        element.innerHTML = element.dataset.originalText || '';
-        element.disabled = false;
-    }
-}
-
-// Common API functions
-async function apiRequest(endpoint, options = {}) {
+// Load jobs
+async function loadJobs() {
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const response = await fetch(`${API_URL}/jobs`);
+        const jobs = await response.json();
+        displayJobs(jobs);
+    } catch (error) {
+        showAlert('Failed to load jobs', 'error');
+    }
+}
+
+// Display jobs
+function displayJobs(jobs) {
+    const container = document.getElementById('jobsContainer');
+    if (!container) return;
+    
+    container.innerHTML = jobs.map(job => `
+        <div class="job-card">
+            <h3>${job.title}</h3>
+            <p><strong>Company:</strong> ${job.company}</p>
+            <p><strong>Location:</strong> ${job.location}</p>
+            <p><strong>Salary:</strong> ${job.salary}</p>
+            <p><strong>Type:</strong> ${job.job_type}</p>
+            <p>${job.description.substring(0, 150)}...</p>
+            <button onclick="applyForJob(${job.id})" class="btn">Apply Now</button>
+        </div>
+    `).join('');
+}
+
+// Apply for job
+async function applyForJob(jobId) {
+    const name = prompt('Enter your name:');
+    const email = prompt('Enter your email:');
+    const phone = prompt('Enter your phone:');
+    
+    if (!name || !email || !phone) {
+        showAlert('All fields are required', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
+                'Content-Type': 'application/json'
             },
-            ...options
+            body: JSON.stringify({
+                name, email, phone,
+                resume_url: '',
+                cover_letter: '',
+                experience: 0,
+                skills: ''
+            })
         });
         
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({ error: 'Request failed' }));
-            throw new Error(error.error || `HTTP ${response.status}`);
+        if (response.ok) {
+            showAlert('Application submitted successfully!', 'success');
+        } else {
+            showAlert('Failed to submit application', 'error');
         }
-        
-        return await response.json();
     } catch (error) {
-        console.error('API Request Error:', error);
-        throw error;
+        showAlert('Network error', 'error');
     }
 }
 
-// Export for use in admin.html
-if (typeof module === 'object' && module.exports) {
-    module.exports = { showAlert, setLoading, apiRequest, API_BASE_URL };
-}
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+        loadJobs();
+    }
+});
