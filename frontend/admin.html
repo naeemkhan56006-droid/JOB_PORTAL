@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | National Job Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen">
+        <div class="login-container">
+            <h2 class="login-title">Admin Login</h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: var(--dark-gray);">
+                National Job Portal - Employer Dashboard
+            </p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" 
+                           placeholder="Enter admin password" required>
+                    <small style="color: var(--dark-gray); font-size: 0.875rem; margin-top: 0.5rem;">
+                        Default password: njp123
+                    </small>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%; margin-top: 1.5rem;">
+                    <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" style="display: none;">
+        <!-- Admin Header -->
+        <header class="admin-header">
+            <div class="container admin-nav">
+                <div class="logo">
+                    <i class="fas fa-user-shield logo-icon"></i>
+                    <span>NJP Admin Dashboard</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="adminMobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="admin-menu" id="adminMenu">
+                    <li><a href="#" class="active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a></li>
+                    <li><a href="#" data-tab="jobs">
+                        <i class="fas fa-briefcase"></i> Manage Jobs
+                    </a></li>
+                    <li><a href="#" data-tab="applications">
+                        <i class="fas fa-file-alt"></i> Applications
+                    </a></li>
+                    <li><a href="#" data-tab="postJob">
+                        <i class="fas fa-plus-circle"></i> Post Job
+                    </a></li>
+                    <li>
+                        <button class="btn btn-danger btn-small" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <div class="container">
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content active">
+                    <h1 style="margin-bottom: 2rem;">Dashboard Overview</h1>
+                    
+                    <div class="dashboard-cards">
+                        <div class="card">
+                            <h3 class="card-title">Total Jobs Posted</h3>
+                            <p class="card-value" id="totalJobs">0</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">Active Jobs</h3>
+                            <p class="card-value" id="activeJobs">0</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">Total Applications</h3>
+                            <p class="card-value" id="totalApplications">0</p>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">Pending Applications</h3>
+                            <p class="card-value" id="pendingApplications">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Applications -->
+                    <div class="table-container">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem;">
+                            <h3 style="margin: 0;">Recent Applications</h3>
+                            <div style="display: flex; gap: 1rem;">
+                                <select id="statusFilter" class="form-control" style="width: 150px;">
+                                    <option value="">All Status</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Reviewed">Reviewed</option>
+                                    <option value="Shortlisted">Shortlisted</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                                <button class="btn btn-small" onclick="loadApplications()">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <table id="applicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Job Title</th>
+                                    <th>Experience</th>
+                                    <th>Status</th>
+                                    <th>Applied Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 2rem;">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Manage Jobs Tab -->
+                <div id="jobsTab" class="tab-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h1>Manage Jobs</h1>
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-outline" onclick="toggleActiveFilter()" id="activeFilterBtn">
+                                <i class="fas fa-eye"></i> Show All
+                            </button>
+                            <button class="btn" onclick="showTab('postJob')">
+                                <i class="fas fa-plus"></i> Post New Job
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="jobsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Type</th>
+                                    <th>Applications</th>
+                                    <th>Status</th>
+                                    <th>Posted Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 2rem;">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Applications Tab -->
+                <div id="applicationsTab" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">All Applications</h1>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <select id="applicationJobFilter" class="form-control" style="width: 200px;">
+                            <option value="">All Jobs</option>
+                        </select>
+                        <select id="applicationStatusFilter" class="form-control" style="width: 150px;">
+                            <option value="">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Reviewed">Reviewed</option>
+                            <option value="Shortlisted">Shortlisted</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        <button class="btn" onclick="loadAllApplications()">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportApplications()">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="allApplicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Candidate</th>
+                                    <th>Contact</th>
+                                    <th>Job Applied</th>
+                                    <th>Experience</th>
+                                    <th>Skills</th>
+                                    <th>Status</th>
+                                    <th>Applied Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 2rem;">
+                                        <div class="spinner"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Post Job Tab -->
+                <div id="postJobTab" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">Post New Job</h1>
+                    
+                    <div class="form-container">
+                        <form id="postJobForm">
+                            <input type="hidden" id="editJobId">
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="jobTitle">Job Title *</label>
+                                    <input type="text" id="jobTitle" class="form-control" required 
+                                           placeholder="e.g., Senior Software Engineer">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="jobCompany">Company Name *</label>
+                                    <input type="text" id="jobCompany" class="form-control" required 
+                                           placeholder="e.g., Tech Solutions Inc.">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="jobLocation">Location *</label>
+                                    <input type="text" id="jobLocation" class="form-control" required 
+                                           placeholder="e.g., Bangalore, Remote">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="jobSalary">Salary Range</label>
+                                    <input type="text" id="jobSalary" class="form-control" 
+                                           placeholder="e.g., ₹8,00,000 - ₹12,00,000">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="jobType">Job Type *</label>
+                                    <select id="jobType" class="form-control" required>
+                                        <option value="">Select Type</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Remote">Remote</option>
+                                        <option value="Internship">Internship</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="jobCategory">Category *</label>
+                                    <select id="jobCategory" class="form-control" required>
+                                        <option value="">Select Category</option>
+                                        <option value="IT">IT & Software</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Finance">Finance & Banking</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="jobDescription">Job Description *</label>
+                                <textarea id="jobDescription" class="form-control" rows="6" required 
+                                          placeholder="Detailed description of the job role, responsibilities, and expectations..."></textarea>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="jobRequirements">Requirements (one per line)</label>
+                                    <textarea id="jobRequirements" class="form-control" rows="4" 
+                                              placeholder="• Bachelor's degree in Computer Science&#10;• 3+ years of experience with JavaScript&#10;• Experience with React or Angular"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="jobBenefits">Benefits (one per line)</label>
+                                    <textarea id="jobBenefits" class="form-control" rows="4" 
+                                              placeholder="• Health insurance&#10;• Flexible working hours&#10;• Remote work options&#10;• Annual bonus"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem;">
+                                <input type="checkbox" id="jobActive" checked>
+                                <label for="jobActive" style="margin: 0; font-weight: 500;">
+                                    Job is active and visible to candidates
+                                </label>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-top: 2.5rem;">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Save Job
+                                </button>
+                                
+                                <button type="button" class="btn" onclick="saveJobAndPublish()">
+                                    <i class="fas fa-paper-plane"></i> Save & Publish
+                                </button>
+                                
+                                <button type="button" class="btn btn-secondary" onclick="showTab('jobs')">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Application Details Modal -->
+    <div id="applicationDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Application Details</h3>
+                <button class="close-btn" onclick="closeApplicationDetailModal()">&times;</button>
+            </div>
+            <div id="applicationDetailContent" style="padding: 1.5rem;">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Admin Dashboard JavaScript
+        const API_BASE_URL = window.location.origin + '/api';
+        
+        // State
+        let adminPassword = null;
+        let allJobsList = [];
+        let showOnlyActive = true;
+        let currentApplications = [];
+
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminMenu = document.getElementById('adminMenu');
+        const adminMobileMenu = document.getElementById('adminMobileMenu');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in
+            const savedPassword = localStorage.getItem('njp_admin_password');
+            if (savedPassword === 'njp123') {
+                adminPassword = savedPassword;
+                loginScreen.style.display = 'none';
+                dashboardScreen.style.display = 'block';
+                loadDashboardData();
+            }
+            
+            setupEventListeners();
+        });
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Login form
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Logout
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Admin menu tabs
+            document.querySelectorAll('.admin-menu a[data-tab]').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = e.currentTarget.dataset.tab;
+                    showTab(tabName);
+                    
+                    // Update active state
+                    document.querySelectorAll('.admin-menu a').forEach(a => {
+                        a.classList.remove('active');
+                    });
+                    e.currentTarget.classList.add('active');
+                });
+            });
+            
+            // Mobile menu
+            adminMobileMenu.addEventListener('click', () => {
+                adminMenu.classList.toggle('active');
+            });
+            
+            // Status filter
+            document.getElementById('statusFilter')?.addEventListener('change', loadApplications);
+            
+            // Post job form
+            document.getElementById('postJobForm')?.addEventListener('submit', handlePostJob);
+        }
+
+        // Handle login
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'njp123') {
+                adminPassword = password;
+                localStorage.setItem('njp_admin_password', password);
+                
+                loginScreen.style.display = 'none';
+                dashboardScreen.style.display = 'block';
+                showAlert('success', 'Login successful!');
+                loadDashboardData();
+            } else {
+                showAlert('error', 'Incorrect password. Please try again.');
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            adminPassword = null;
+            localStorage.removeItem('njp_admin_password');
+            
+            loginScreen.style.display = 'block';
+            dashboardScreen.style.display = 'none';
+            showAlert('success', 'Logged out successfully');
+        }
+
+        // Show tab
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Load data for the tab
+            switch(tabName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'jobs':
+                    loadJobsTable();
+                    break;
+                case 'applications':
+                    loadAllApplications();
+                    loadJobFilterOptions();
+                    break;
+                case 'postJob':
+                    // Clear form if not editing
+                    if (!document.getElementById('editJobId').value) {
+                        document.getElementById('postJobForm').reset();
+                        document.getElementById('jobActive').checked = true;
+                    }
+                    break;
+            }
+            
+            // Close mobile menu
+            adminMenu.classList.remove('active');
+        }
+
+        // Get admin headers
+        function getAdminHeaders() {
+            return {
+                'X-Admin-Password': adminPassword
+            };
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsResponse = await fetch(`${API_BASE_URL}/stats`, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (statsResponse.ok) {
+                    const stats = await statsResponse.json();
+                    document.getElementById('totalJobs').textContent = stats.total_jobs;
+                    document.getElementById('activeJobs').textContent = stats.active_jobs;
+                    document.getElementById('totalApplications').textContent = stats.total_applications;
+                    document.getElementById('pendingApplications').textContent = stats.applications_by_status.pending;
+                }
+                
+                // Load recent applications
+                await loadApplications();
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showAlert('error', 'Failed to load dashboard data');
+            }
+        }
+
+        // Load applications for dashboard
+        async function loadApplications() {
+            try {
+                const tableBody = document.querySelector('#applicationsTable tbody');
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;"><div class="spinner"></div></td></tr>';
+                
+                const response = await fetch(`${API_BASE_URL}/applications`, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    const applications = await response.json();
+                    currentApplications = applications;
+                    
+                    // Apply status filter
+                    const statusFilter = document.getElementById('statusFilter')?.value;
+                    let filteredApps = applications;
+                    if (statusFilter) {
+                        filteredApps = applications.filter(app => app.status === statusFilter);
+                    }
+                    
+                    // Get top 10 recent applications
+                    filteredApps = filteredApps.slice(0, 10);
+                    
+                    if (filteredApps.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--dark-gray);">
+                                    No applications found.
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        tableBody.innerHTML = filteredApps.map(app => `
+                            <tr>
+                                <td>${app.name}</td>
+                                <td>${app.email}</td>
+                                <td>${app.phone}</td>
+                                <td>${app.job_title || 'N/A'}</td>
+                                <td>${app.experience} yrs</td>
+                                <td>
+                                    <span class="badge ${getStatusBadgeClass(app.status)}">
+                                        ${app.status}
+                                    </span>
+                                </td>
+                                <td>${new Date(app.applied_date).toLocaleDateString()}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-btn" onclick="viewApplication(${app.id})">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        <select class="form-control" style="width: 120px; padding: 4px;" 
+                                                onchange="updateApplicationStatus(${app.id}, this.value)">
+                                            <option value="Pending" ${app.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                            <option value="Reviewed" ${app.status === 'Reviewed' ? 'selected' : ''}>Reviewed</option>
+                                            <option value="Shortlisted" ${app.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                                            <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                showAlert('error', 'Failed to load applications');
+            }
+        }
+
+        // Load all applications for applications tab
+        async function loadAllApplications() {
+            try {
+                const tableBody = document.querySelector('#allApplicationsTable tbody');
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem;"><div class="spinner"></div></td></tr>';
+                
+                const jobFilter = document.getElementById('applicationJobFilter')?.value;
+                const statusFilter = document.getElementById('applicationStatusFilter')?.value;
+                
+                let url = `${API_BASE_URL}/applications`;
+                const response = await fetch(url, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    let applications = await response.json();
+                    
+                    // Apply filters
+                    if (jobFilter) {
+                        applications = applications.filter(app => app.job_id == jobFilter);
+                    }
+                    if (statusFilter) {
+                        applications = applications.filter(app => app.status === statusFilter);
+                    }
+                    
+                    if (applications.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 2rem; color: var(--dark-gray);">
+                                    No applications found matching your criteria.
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        tableBody.innerHTML = applications.map(app => `
+                            <tr>
+                                <td>${app.id}</td>
+                                <td>
+                                    <strong>${app.name}</strong><br>
+                                    <small style="color: var(--dark-gray);">${app.email}</small>
+                                </td>
+                                <td>${app.phone}</td>
+                                <td>${app.job_title || 'N/A'}</td>
+                                <td>${app.experience} yrs</td>
+                                <td>${app.skills || 'N/A'}</td>
+                                <td>
+                                    <span class="badge ${getStatusBadgeClass(app.status)}">
+                                        ${app.status}
+                                    </span>
+                                </td>
+                                <td>${new Date(app.applied_date).toLocaleDateString()}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-btn" onclick="viewApplication(${app.id})">
+                                            <i class="fas fa-eye"></i> Details
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading all applications:', error);
+                showAlert('error', 'Failed to load applications');
+            }
+        }
+
+        // Load job filter options
+        async function loadJobFilterOptions() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/jobs/all`, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    const jobs = await response.json();
+                    const select = document.getElementById('applicationJobFilter');
+                    if (select) {
+                        select.innerHTML = '<option value="">All Jobs</option>' + 
+                            jobs.map(job => `<option value="${job.id}">${job.title} - ${job.company}</option>`).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading job options:', error);
+            }
+        }
+
+        // Load jobs table
+        async function loadJobsTable() {
+            try {
+                const tableBody = document.querySelector('#jobsTable tbody');
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem;"><div class="spinner"></div></td></tr>';
+                
+                const response = await fetch(`${API_BASE_URL}/jobs/all`, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    let jobs = await response.json();
+                    allJobsList = jobs;
+                    
+                    // Apply active filter
+                    if (showOnlyActive) {
+                        jobs = jobs.filter(job => job.is_active);
+                    }
+                    
+                    if (jobs.length === 0) {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--dark-gray);">
+                                    No jobs found. Post your first job!
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        tableBody.innerHTML = jobs.map(job => `
+                            <tr>
+                                <td>${job.title}</td>
+                                <td>${job.company}</td>
+                                <td>${job.location}</td>
+                                <td>${job.job_type}</td>
+                                <td>${job.application_count}</td>
+                                <td>
+                                    ${job.is_active 
+                                        ? '<span class="badge badge-success">Active</span>'
+                                        : '<span class="badge badge-danger">Inactive</span>'
+                                    }
+                                </td>
+                                <td>${new Date(job.posted_date).toLocaleDateString()}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn edit-btn" onclick="editJob(${job.id})">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="action-btn ${job.is_active ? 'btn-danger' : 'btn-success'}" 
+                                                onclick="toggleJobStatus(${job.id}, ${job.is_active})">
+                                            <i class="fas ${job.is_active ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                                            ${job.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                        <button class="action-btn delete-btn" onclick="deleteJob(${job.id})">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                showAlert('error', 'Failed to load jobs');
+            }
+        }
+
+        // Toggle active filter
+        function toggleActiveFilter() {
+            showOnlyActive = !showOnlyActive;
+            const button = document.getElementById('activeFilterBtn');
+            button.innerHTML = showOnlyActive 
+                ? '<i class="fas fa-eye"></i> Show All'
+                : '<i class="fas fa-eye-slash"></i> Show Active Only';
+            loadJobsTable();
+        }
+
+        // Handle post job form
+        async function handlePostJob(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
+            
+            const jobId = document.getElementById('editJobId').value;
+            const isActive = document.getElementById('jobActive').checked;
+            
+            const jobData = {
+                title: document.getElementById('jobTitle').value,
+                company: document.getElementById('jobCompany').value,
+                location: document.getElementById('jobLocation').value,
+                salary: document.getElementById('jobSalary').value,
+                job_type: document.getElementById('jobType').value,
+                category: document.getElementById('jobCategory').value,
+                description: document.getElementById('jobDescription').value,
+                requirements: document.getElementById('jobRequirements').value,
+                benefits: document.getElementById('jobBenefits').value,
+                is_active: isActive
+            };
+            
+            try {
+                const url = jobId ? `${API_BASE_URL}/jobs/${jobId}` : `${API_BASE_URL}/jobs`;
+                const method = jobId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAdminHeaders()
+                    },
+                    body: JSON.stringify(jobData)
+                });
+                
+                if (response.ok) {
+                    showAlert('success', jobId ? 'Job updated successfully!' : 'Job created successfully!');
+                    
+                    // Clear form and switch to jobs tab
+                    document.getElementById('postJobForm').reset();
+                    document.getElementById('editJobId').value = '';
+                    document.getElementById('jobActive').checked = true;
+                    
+                    showTab('jobs');
+                } else {
+                    const error = await response.json();
+                    showAlert('error', error.error || 'Failed to save job');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Save job and publish
+        async function saveJobAndPublish() {
+            const jobId = document.getElementById('editJobId').value;
+            
+            const jobData = {
+                title: document.getElementById('jobTitle').value,
+                company: document.getElementById('jobCompany').value,
+                location: document.getElementById('jobLocation').value,
+                salary: document.getElementById('jobSalary').value,
+                job_type: document.getElementById('jobType').value,
+                category: document.getElementById('jobCategory').value,
+                description: document.getElementById('jobDescription').value,
+                requirements: document.getElementById('jobRequirements').value,
+                benefits: document.getElementById('jobBenefits').value,
+                is_active: true
+            };
+            
+            try {
+                const url = jobId ? `${API_BASE_URL}/jobs/${jobId}` : `${API_BASE_URL}/jobs`;
+                const method = jobId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAdminHeaders()
+                    },
+                    body: JSON.stringify(jobData)
+                });
+                
+                if (response.ok) {
+                    showAlert('success', 'Job published successfully!');
+                    
+                    // Clear form and switch to jobs tab
+                    document.getElementById('postJobForm').reset();
+                    document.getElementById('editJobId').value = '';
+                    document.getElementById('jobActive').checked = true;
+                    
+                    showTab('jobs');
+                } else {
+                    const error = await response.json();
+                    showAlert('error', error.error || 'Failed to publish job');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+            }
+        }
+
+        // Edit job
+        async function editJob(jobId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    const job = await response.json();
+                    
+                    // Fill form with job data
+                    document.getElementById('editJobId').value = job.id;
+                    document.getElementById('jobTitle').value = job.title;
+                    document.getElementById('jobCompany').value = job.company;
+                    document.getElementById('jobLocation').value = job.location;
+                    document.getElementById('jobSalary').value = job.salary;
+                    document.getElementById('jobType').value = job.job_type;
+                    document.getElementById('jobCategory').value = job.category;
+                    document.getElementById('jobDescription').value = job.description;
+                    document.getElementById('jobRequirements').value = job.requirements || '';
+                    document.getElementById('jobBenefits').value = job.benefits || '';
+                    document.getElementById('jobActive').checked = job.is_active;
+                    
+                    // Switch to post job tab
+                    showTab('postJob');
+                    
+                    // Update menu active state
+                    document.querySelectorAll('.admin-menu a').forEach(a => {
+                        a.classList.remove('active');
+                    });
+                    document.querySelector('.admin-menu a[data-tab="postJob"]').classList.add('active');
+                }
+            } catch (error) {
+                showAlert('error', 'Failed to load job details');
+            }
+        }
+
+        // Toggle job status
+        async function toggleJobStatus(jobId, isCurrentlyActive) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAdminHeaders()
+                    },
+                    body: JSON.stringify({
+                        is_active: !isCurrentlyActive
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('success', `Job ${!isCurrentlyActive ? 'activated' : 'deactivated'} successfully!`);
+                    loadJobsTable();
+                    loadDashboardData();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', error.error || 'Failed to update job');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+            }
+        }
+
+        // Delete job
+        async function deleteJob(jobId) {
+            if (!confirm('Are you sure you want to delete this job? This will also delete all applications for this job. This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/jobs/${jobId}`, {
+                    method: 'DELETE',
+                    headers: getAdminHeaders()
+                });
+                
+                if (response.ok) {
+                    showAlert('success', 'Job deleted successfully!');
+                    loadJobsTable();
+                    loadDashboardData();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', error.error || 'Failed to delete job');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+            }
+        }
+
+        // Update application status
+        async function updateApplicationStatus(appId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/applications/${appId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAdminHeaders()
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('success', 'Application status updated!');
+                    loadApplications();
+                    loadDashboardData();
+                } else {
+                    const error = await response.json();
+                    showAlert('error', error.error || 'Failed to update status');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+            }
+        }
+
+        // View application details
+        async function viewApplication(appId) {
+            try {
+                // Find the application
+                const application = currentApplications.find(app => app.id == appId);
+                if (!application) {
+                    showAlert('error', 'Application not found');
+                    return;
+                }
+                
+                const modal = document.getElementById('applicationDetailModal');
+                const content = document.getElementById('applicationDetailContent');
+                
+                content.innerHTML = `
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h4 style="margin-bottom: 0.5rem; color: var(--text-dark);">${application.name}</h4>
+                                <p style="color: var(--dark-gray); margin-bottom: 0.5rem;">${application.email}</p>
+                                <p style="color: var(--dark-gray);">${application.phone}</p>
+                            </div>
+                            <span class="badge ${getStatusBadgeClass(application.status)}" style="font-size: 0.875rem;">
+                                ${application.status}
+                            </span>
+                        </div>
+                        
+                        <div>
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Job Applied</h5>
+                            <p style="color: var(--dark-gray);">${application.job_title || 'N/A'} at ${application.company || 'N/A'}</p>
+                        </div>
+                        
+                        <div>
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Experience</h5>
+                            <p style="color: var(--dark-gray);">${application.experience} years</p>
+                        </div>
+                        
+                        <div>
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Skills</h5>
+                            <p style="color: var(--dark-gray);">${application.skills || 'Not specified'}</p>
+                        </div>
+                        
+                        ${application.cover_letter ? `
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Cover Letter</h5>
+                                <div style="background: var(--light-gray); padding: 1rem; border-radius: 8px;">
+                                    <p style="color: var(--dark-gray); white-space: pre-wrap;">${application.cover_letter}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${application.resume_url ? `
+                            <div>
+                                <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Resume</h5>
+                                <a href="${application.resume_url}" target="_blank" class="btn btn-small">
+                                    <i class="fas fa-external-link-alt"></i> View Resume
+                                </a>
+                            </div>
+                        ` : ''}
+                        
+                        <div>
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Applied Date</h5>
+                            <p style="color: var(--dark-gray);">${new Date(application.applied_date).toLocaleString()}</p>
+                        </div>
+                        
+                        <div>
+                            <h5 style="margin-bottom: 0.5rem; color: var(--text-dark);">Update Status</h5>
+                            <select class="form-control" onchange="updateApplicationStatus(${appId}, this.value)" 
+                                    style="width: 200px;">
+                                <option value="Pending" ${application.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Reviewed" ${application.status === 'Reviewed' ? 'selected' : ''}>Reviewed</option>
+                                <option value="Shortlisted" ${application.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
+                                <option value="Rejected" ${application.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                
+                modal.style.display = 'flex';
+            } catch (error) {
+                console.error('Error viewing application:', error);
+                showAlert('error', 'Failed to load application details');
+            }
+        }
+
+        // Close application detail modal
+        function closeApplicationDetailModal() {
+            document.getElementById('applicationDetailModal').style.display = 'none';
+        }
+
+        // Export applications to CSV
+        function exportApplications() {
+            try {
+                const applications = currentApplications;
+                if (!applications || applications.length === 0) {
+                    showAlert('info', 'No applications to export');
+                    return;
+                }
+                
+                // Create CSV content
+                const headers = ['ID', 'Name', 'Email', 'Phone', 'Job Title', 'Company', 'Experience', 'Skills', 'Status', 'Applied Date'];
+                const csvRows = [
+                    headers.join(','),
+                    ...applications.map(app => [
+                        app.id,
+                        `"${app.name}"`,
+                        app.email,
+                        app.phone,
+                        `"${app.job_title || ''}"`,
+                        `"${app.company || ''}"`,
+                        app.experience,
+                        `"${app.skills || ''}"`,
+                        app.status,
+                        new Date(app.applied_date).toLocaleDateString()
+                    ].join(','))
+                ];
+                
+                const csvContent = csvRows.join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `applications_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                showAlert('success', 'Applications exported successfully');
+            } catch (error) {
+                console.error('Error exporting applications:', error);
+                showAlert('error', 'Failed to export applications');
+            }
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Pending': return 'badge-warning';
+                case 'Reviewed': return 'badge-info';
+                case 'Shortlisted': return 'badge-success';
+                case 'Rejected': return 'badge-danger';
+                default: return 'badge-info';
+            }
+        }
+    </script>
+</body>
+</html>
